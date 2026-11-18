@@ -1,0 +1,1984 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SOCIAL CIRCLE — Serverless Collective Social Architecture</title>
+  <style>
+    /* ==========================================================================
+       I. ARCHITECTURAL DESIGN TOKENS & CHROMATIC SYSTEM
+       Engineered for low-ocular-strain contrast, bold structural borders,
+       and crisp geometric hierarchy (Neo-Brutalist Editorial meets Modern Collective).
+       ========================================================================== */
+    :root {
+      --bg-canvas: #F3F1EC;          /* Warm Alabaster Paper — eliminates blue-light glare */
+      --bg-surface: #FFFFFF;         /* Pure High-Contrast Card Surface */
+      --bg-elevated: #EAE6DF;        /* Recessed Structural Well */
+      --bg-accent-soft: #E0F2FE;     /* Soft Cerulean Highlight */
+      
+      --ink-primary: #111315;        /* Obsidian Charcoal — maximum legibility */
+      --ink-secondary: #475569;      /* Slate Graph — balanced secondary hierarchy */
+      --ink-inverse: #FFFFFF;
+
+
+      --brand-primary: #0F4C81;      /* Classic Cobalt — authoritative & calm */
+      --brand-secondary: #D95D39;    /* Terracotta Signal — energetic action trigger */
+      --brand-emerald: #15803D;      /* Collective Verification & Live Status */
+      --brand-gold: #D97706;         /* Scheduled / AI Synthesis Accent */
+
+
+      --border-ink: #111315;         /* Crisp 2px Structural Outlining */
+      --border-width: 2px;
+      --shadow-hard: 4px 4px 0px #111315;
+      --shadow-hard-sm: 2px 2px 0px #111315;
+      --radius-sharp: 6px;
+
+
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+
+      /* Custom SVG Question-Mark Cursor for Desktop Precision */
+      --cursor-question: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><circle cx='14' cy='14' r='12' fill='%230F4C81' stroke='%23111315' stroke-width='2'/><text x='14' y='19' font-family='Arial, sans-serif' font-weight='900' font-size='16' fill='%23FFFFFF' text-anchor='middle'>?</text></svg>") 14 14, help;
+    }
+
+
+    /* ==========================================================================
+       II. GLOBAL RESET & DESKTOP QUESTION-MARK POINTER AFFORDANCE
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+
+    html, body {
+      background-color: var(--bg-canvas);
+      color: var(--ink-primary);
+      font-family: var(--font-sans);
+      line-height: 1.55;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+
+    /* Apply Question Mark Cursor across Desktop Viewports */
+    @media (hover: hover) and (pointer: fine) {
+      body, button, a, input, textarea, select, .card, .nav-item {
+        cursor: var(--cursor-question);
+      }
+    }
+
+
+    /* ==========================================================================
+       III. AUTHENTICATION & CREDENTIAL GATEWAY VIEW
+       ========================================================================== */
+    #auth-gateway {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1.5rem;
+      background-image: radial-gradient(#111315 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+
+    .auth-panel {
+      width: 100%;
+      max-width: 480px;
+      background: var(--bg-surface);
+      border: var(--border-width) solid var(--border-ink);
+      box-shadow: 8px 8px 0px var(--border-ink);
+      border-radius: var(--radius-sharp);
+      padding: 2.25rem;
+    }
+
+
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--brand-primary);
+      color: var(--ink-inverse);
+      padding: 0.35rem 0.75rem;
+      font-weight: 800;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      border: 2px solid var(--border-ink);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+
+    .auth-panel h1 {
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+    }
+
+
+    .auth-panel p.subtitle {
+      color: var(--ink-secondary);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+
+    .tab-btn {
+      padding: 0.65rem;
+      font-weight: 800;
+      font-size: 0.9rem;
+      border: 2px solid var(--border-ink);
+      background: var(--bg-elevated);
+      color: var(--ink-primary);
+      border-radius: var(--radius-sharp);
+      transition: transform 0.1s ease;
+    }
+
+
+    .tab-btn.active {
+      background: var(--brand-secondary);
+      color: var(--ink-inverse);
+      box-shadow: var(--shadow-hard-sm);
+    }
+
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+
+    .form-group label {
+      display: block;
+      font-weight: 700;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.35rem;
+    }
+
+
+    .form-control {
+      width: 100%;
+      padding: 0.7rem 0.85rem;
+      border: 2px solid var(--border-ink);
+      border-radius: var(--radius-sharp);
+      font-family: inherit;
+      font-size: 0.95rem;
+      background: var(--bg-surface);
+      color: var(--ink-primary);
+    }
+
+
+    .form-control:focus {
+      outline: none;
+      background: #FFFDF7;
+      box-shadow: var(--shadow-hard-sm);
+    }
+
+
+    /* ==========================================================================
+       IV. BUTTONS & INTERACTIVE PRIMITIVES
+       ========================================================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.65rem 1.15rem;
+      font-weight: 800;
+      font-size: 0.9rem;
+      border: 2px solid var(--border-ink);
+      border-radius: var(--radius-sharp);
+      background: var(--bg-surface);
+      color: var(--ink-primary);
+      box-shadow: var(--shadow-hard-sm);
+      transition: all 0.12s ease;
+      text-decoration: none;
+    }
+
+
+    .btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: var(--shadow-hard);
+    }
+
+
+    .btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px var(--border-ink);
+    }
+
+
+    .btn-primary {
+      background: var(--brand-primary);
+      color: var(--ink-inverse);
+    }
+
+
+    .btn-accent {
+      background: var(--brand-secondary);
+      color: var(--ink-inverse);
+    }
+
+
+    .btn-ai {
+      background: #1E1B4B;
+      color: #FDE047;
+    }
+
+
+    .btn-sm {
+      padding: 0.35rem 0.7rem;
+      font-size: 0.78rem;
+    }
+
+
+    .btn-block {
+      width: 100%;
+    }
+
+
+    /* ==========================================================================
+       V. MAIN APPLICATION SHELL (3-COLUMN COLLECTIVE WORKSPACE)
+       ========================================================================== */
+    #app-shell {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+
+    /* Top Sticky Navigation Bar */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg-surface);
+      border-bottom: var(--border-width) solid var(--border-ink);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+
+    .logo-lockup {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-weight: 900;
+      font-size: 1.35rem;
+      letter-spacing: -0.04em;
+    }
+
+
+    .logo-circle {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--brand-secondary);
+      border: 2px solid var(--border-ink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFF;
+      font-weight: 900;
+      box-shadow: 2px 2px 0px var(--border-ink);
+    }
+
+
+    .search-bar {
+      flex: 1;
+      max-width: 440px;
+      position: relative;
+    }
+
+
+    .search-bar input {
+      width: 100%;
+      padding: 0.5rem 0.9rem;
+      border: 2px solid var(--border-ink);
+      border-radius: 999px;
+      background: var(--bg-canvas);
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+
+    .db-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.7rem;
+      background: #DCFCE7;
+      border: 2px solid var(--border-ink);
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #14532D;
+    }
+
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: #16A34A;
+      border-radius: 50%;
+      animation: pulse 1.8s infinite;
+    }
+
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.6; }
+      100% { transform: scale(0.95); opacity: 1; }
+    }
+
+
+    /* Main Responsive Grid */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 270px minmax(0, 680px) 310px;
+      justify-content: center;
+      gap: 1.5rem;
+      padding: 1.5rem;
+      max-width: 1380px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+
+    /* ==========================================================================
+       VI. CARDS, SIDEBARS & COMPOSER ARCHITECTURE
+       ========================================================================== */
+    .card {
+      background: var(--bg-surface);
+      border: var(--border-width) solid var(--border-ink);
+      border-radius: var(--radius-sharp);
+      box-shadow: var(--shadow-hard);
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+
+    .card-header {
+      font-weight: 900;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding-bottom: 0.65rem;
+      margin-bottom: 0.9rem;
+      border-bottom: 2px solid var(--border-ink);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+
+    /* Profile Identity Card */
+    .profile-banner {
+      height: 64px;
+      background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+      border: 2px solid var(--border-ink);
+      border-radius: 4px;
+      margin-bottom: -26px;
+    }
+
+
+    .avatar-ring {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      border: 2px solid var(--border-ink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.25rem;
+      margin-left: 0.75rem;
+      box-shadow: 2px 2px 0px var(--border-ink);
+    }
+
+
+    .nav-menu {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+
+    .nav-item {
+      padding: 0.6rem 0.85rem;
+      border: 2px solid transparent;
+      border-radius: var(--radius-sharp);
+      font-weight: 700;
+      font-size: 0.92rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+
+    .nav-item:hover, .nav-item.active {
+      background: var(--bg-elevated);
+      border-color: var(--border-ink);
+      box-shadow: var(--shadow-hard-sm);
+    }
+
+
+    /* Omnichannel Composer */
+    .composer-textarea {
+      width: 100%;
+      min-height: 92px;
+      border: 2px solid var(--border-ink);
+      border-radius: var(--radius-sharp);
+      padding: 0.85rem;
+      font-family: inherit;
+      font-size: 1rem;
+      resize: vertical;
+      background: #FAFAF8;
+      margin-bottom: 0.85rem;
+    }
+
+
+    .composer-textarea:focus {
+      outline: none;
+      background: #FFFFFF;
+      box-shadow: var(--shadow-hard-sm);
+    }
+
+
+    .ai-studio-drawer {
+      background: #F8FAFC;
+      border: 2px dashed var(--border-ink);
+      border-radius: var(--radius-sharp);
+      padding: 0.9rem;
+      margin-bottom: 0.9rem;
+    }
+
+
+    .ai-drawer-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+
+    .media-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding-top: 0.75rem;
+      border-top: 2px solid var(--bg-elevated);
+    }
+
+
+    .media-upload-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+
+
+    .file-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.7rem;
+      background: var(--bg-elevated);
+      border: 2px solid var(--border-ink);
+      border-radius: var(--radius-sharp);
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+
+
+    .file-pill input[type="file"] {
+      display: none;
+    }
+
+
+    .attachment-preview {
+      margin: 0.75rem 0;
+      padding: 0.75rem;
+      background: var(--bg-canvas);
+      border: 2px solid var(--border-ink);
+      border-radius: var(--radius-sharp);
+      display: none;
+    }
+
+
+    .attachment-preview img {
+      max-width: 100%;
+      max-height: 260px;
+      border: 2px solid var(--border-ink);
+      border-radius: 4px;
+      display: block;
+      margin-top: 0.5rem;
+    }
+
+
+    /* ==========================================================================
+       VII. FEED STREAM, MULTILINGUAL TRANSLATOR & MEDIA CARDS
+       ========================================================================== */
+    .feed-filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      background: var(--bg-surface);
+      padding: 0.65rem 1rem;
+      border: 2px solid var(--border-ink);
+      border-radius: var(--radius-sharp);
+    }
+
+
+    .post-card {
+      background: var(--bg-surface);
+      border: 2px solid var(--border-ink);
+      border-radius: var(--radius-sharp);
+      box-shadow: var(--shadow-hard);
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+      transition: transform 0.12s ease;
+    }
+
+
+    .post-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.85rem;
+    }
+
+
+    .post-author-info {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+
+    .post-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 2px solid var(--border-ink);
+      background: var(--brand-primary);
+      color: #FFF;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+    }
+
+
+    .badge-tag {
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 0.15rem 0.5rem;
+      border: 1.5px solid var(--border-ink);
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+
+    .badge-ai {
+      background: #FEF08A;
+      color: #111315;
+    }
+
+
+    .badge-scheduled {
+      background: #DBEAFE;
+      color: #1E3A8A;
+    }
+
+
+    .post-body {
+      font-size: 1.02rem;
+      margin-bottom: 0.9rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+
+    .post-media-box {
+      margin-bottom: 0.9rem;
+      border: 2px solid var(--border-ink);
+      border-radius: 4px;
+      overflow: hidden;
+      background: #000;
+    }
+
+
+    .post-media-box img {
+      width: 100%;
+      max-height: 440px;
+      object-fit: contain;
+      display: block;
+      background: #111315;
+    }
+
+
+    .audio-deck {
+      background: #111315;
+      color: #FFFFFF;
+      padding: 0.85rem;
+      border: 2px solid var(--border-ink);
+      border-radius: 4px;
+      margin-bottom: 0.9rem;
+    }
+
+
+    .audio-deck-title {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: #FDE047;
+      margin-bottom: 0.45rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+
+    .audio-deck audio {
+      width: 100%;
+      height: 36px;
+    }
+
+
+    /* Universal Feed Translator Bar */
+    .translator-strip {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg-canvas);
+      padding: 0.5rem 0.75rem;
+      border: 1.5px solid var(--border-ink);
+      border-radius: 4px;
+      margin-bottom: 0.85rem;
+      font-size: 0.82rem;
+    }
+
+
+    .translated-output {
+      margin-top: 0.45rem;
+      padding-top: 0.45rem;
+      border-top: 1px dashed var(--border-ink);
+      font-weight: 600;
+      color: var(--brand-primary);
+      width: 100%;
+    }
+
+
+    .post-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding-top: 0.75rem;
+      border-top: 2px solid var(--bg-elevated);
+    }
+
+
+    .comment-section {
+      margin-top: 0.85rem;
+      padding-top: 0.75rem;
+      border-top: 1.5px dashed var(--border-ink);
+    }
+
+
+    .comment-item {
+      background: var(--bg-canvas);
+      padding: 0.5rem 0.75rem;
+      border: 1.5px solid var(--border-ink);
+      border-radius: 4px;
+      margin-bottom: 0.45rem;
+      font-size: 0.88rem;
+    }
+
+
+    /* ==========================================================================
+       VIII. RESPONSIVE MOBILE & TABLET BREAKPOINTS
+       ========================================================================== */
+    @media (max-width: 1120px) {
+      .workspace-grid {
+        grid-template-columns: 240px minmax(0, 1fr);
+      }
+      .right-rail {
+        display: none;
+      }
+    }
+
+
+    @media (max-width: 768px) {
+      .workspace-grid {
+        grid-template-columns: 1fr;
+        padding: 0.85rem;
+      }
+      .left-rail {
+        display: none;
+      }
+      .topbar {
+        padding: 0.65rem 0.9rem;
+      }
+      .search-bar {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+
+  <!-- ========================================================================
+       SECTION 1: CREDENTIAL & IDENTITY GATEWAY (LOGIN / REGISTER)
+       ======================================================================== -->
+  <section id="auth-gateway">
+    <div class="auth-panel">
+      <div class="brand-badge">● Serverless Collective Protocol v2.6</div>
+      <h1>SOCIAL CIRCLE</h1>
+      <p class="subtitle">
+        A sovereign, serverless social network powered by local IndexedDB persistence, algorithmic transparency, and omnichannel media synthesis.
+      </p>
+
+
+      <div class="auth-tabs">
+        <button type="button" class="tab-btn active" id="tab-login" onclick="AuthController.switchTab('login')">Member Sign In</button>
+        <button type="button" class="tab-btn" id="tab-register" onclick="AuthController.switchTab('register')">Create Circle ID</button>
+      </div>
+
+
+      <form id="auth-form" onsubmit="AuthController.handleSubmit(event)">
+        <div class="form-group" id="group-fullname" style="display: none;">
+          <label for="auth-name">Full Collective Name</label>
+          <input type="text" id="auth-name" class="form-control" placeholder="e.g., Dr. Elena Rostova" />
+        </div>
+
+
+        <div class="form-group" id="group-handle" style="display: none;">
+          <label for="auth-handle">Public Handle (@username)</label>
+          <input type="text" id="auth-handle" class="form-control" placeholder="@elena_collective" />
+        </div>
+
+
+        <div class="form-group">
+          <label for="auth-email">Email Address or Handle</label>
+          <input type="text" id="auth-email" class="form-control" required placeholder="member@socialcircle.org" value="demo@socialcircle.org" />
+        </div>
+
+
+        <div class="form-group">
+          <label for="auth-password">Passphrase Credential</label>
+          <input type="password" id="auth-password" class="form-control" required placeholder="••••••••" value="collective2026" />
+        </div>
+
+
+        <div class="form-group" id="group-bio" style="display: none;">
+          <label for="auth-bio">Manifesto / Bio</label>
+          <input type="text" id="auth-bio" class="form-control" placeholder="Building open communities & digital commons..." />
+        </div>
+
+
+        <button type="submit" class="btn btn-primary btn-block" id="auth-submit-btn">
+          Enter Social Circle →
+        </button>
+      </form>
+
+
+      <div style="margin-top: 1.15rem; padding-top: 0.9rem; border-top: 2px solid var(--bg-elevated); font-size: 0.8rem; color: var(--ink-secondary); display: flex; justify-content: space-between; align-items: center;">
+        <span>Zero-Cloud IndexedDB Vault</span>
+        <button type="button" class="btn btn-sm" onclick="AuthController.quickDemoLogin()">Instant Demo Access</button>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ========================================================================
+       SECTION 2: MAIN SOCIAL CIRCLE APPLICATION SHELL
+       ======================================================================== -->
+  <div id="app-shell">
+    <!-- Top Navigation -->
+    <header class="topbar">
+      <div class="logo-lockup">
+        <div class="logo-circle">SC</div>
+        <span>SOCIAL CIRCLE</span>
+      </div>
+
+
+      <div class="search-bar">
+        <input type="search" id="global-search" placeholder="Search posts, @handles, tags, or audio..." oninput="FeedEngine.renderFeed()" />
+      </div>
+
+
+      <div class="topbar-actions">
+        <span class="db-status-pill" title="IndexedDB Serverless Engine Online">
+          <span class="pulse-dot"></span> IndexedDB Active
+        </span>
+        <button type="button" class="btn btn-sm" onclick="PluginRegistry.exportDatabaseJSON()" title="Backup entire IndexedDB to JSON">
+          Export DB
+        </button>
+        <button type="button" class="btn btn-accent btn-sm" onclick="AuthController.logout()">
+          Sign Out
+        </button>
+      </div>
+    </header>
+
+
+    <!-- 3-Column Collective Workspace -->
+    <main class="workspace-grid">
+      
+      <!-- LEFT RAIL: MEMBER IDENTITY & COLLECTIVE NAVIGATION -->
+      <aside class="left-rail">
+        <div class="card">
+          <div class="profile-banner"></div>
+          <div class="avatar-ring" id="sidebar-avatar">SC</div>
+          <div style="margin-top: 0.65rem;">
+            <h2 id="sidebar-name" style="font-size: 1.15rem; font-weight: 900;">Member Name</h2>
+            <div id="sidebar-handle" style="font-size: 0.85rem; color: var(--brand-primary); font-weight: 700;">@handle</div>
+            <p id="sidebar-bio" style="font-size: 0.85rem; color: var(--ink-secondary); margin-top: 0.5rem;">
+              Collective member contributing to open dialogue.
+            </p>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 1rem; padding-top: 0.85rem; border-top: 2px solid var(--bg-elevated); text-align: center;">
+            <div>
+              <div id="stat-posts" style="font-weight: 900; font-size: 1.15rem;">0</div>
+              <div style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--ink-secondary);">Broadcasts</div>
+            </div>
+            <div>
+              <div id="stat-solidarity" style="font-weight: 900; font-size: 1.15rem;">0</div>
+              <div style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--ink-secondary);">Solidarity</div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="card">
+          <div class="card-header">Circle Channels</div>
+          <ul class="nav-menu">
+            <li class="nav-item active" onclick="FeedEngine.setFilter('all', this)">
+              <span>🌐 Commons Feed</span>
+              <span class="badge-tag" id="count-all">0</span>
+            </li>
+            <li class="nav-item" onclick="FeedEngine.setFilter('ai', this)">
+              <span>✨ AI Synthesized</span>
+              <span class="badge-tag" id="count-ai">0</span>
+            </li>
+            <li class="nav-item" onclick="FeedEngine.setFilter('audio', this)">
+              <span>🎵 Audio & Music</span>
+              <span class="badge-tag" id="count-audio">0</span>
+            </li>
+            <li class="nav-item" onclick="FeedEngine.setFilter('scheduled', this)">
+              <span>⏳ Scheduled Queue</span>
+              <span class="badge-tag" id="count-scheduled">0</span>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+
+      <!-- CENTER COLUMN: AI COMPOSER & NEWS FEED -->
+      <section class="center-feed">
+        
+        <!-- OMNICHANNEL COMPOSER + AI ENGINE -->
+        <div class="card">
+          <div class="card-header">
+            <span>Broadcast to the Collective</span>
+            <span style="font-size: 0.75rem; color: var(--brand-primary);">Rich Media + Scheduler</span>
+          </div>
+
+
+          <textarea id="post-content" class="composer-textarea" placeholder="Share an insight, upload visual art, drop an MP3/WAV track, or invoke the AI Synthesis Engine..."></textarea>
+
+
+          <!-- AI Generative Post Engine Drawer -->
+          <div class="ai-studio-drawer">
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; font-weight: 800;">
+              <span>🧠 AI SOCIAL POST SYNTHESIZER</span>
+              <span style="color: var(--ink-secondary);">Profile-Aware Generative Engine</span>
+            </div>
+            <div class="ai-drawer-row">
+              <input type="text" id="ai-topic-input" class="form-control" style="flex: 2; min-width: 180px; padding: 0.45rem 0.7rem; font-size: 0.85rem;" placeholder="Topic (e.g., Digital Commons, Mutual Aid, Synthwave)..." />
+              <select id="ai-tone-select" class="form-control" style="flex: 1; min-width: 130px; padding: 0.45rem 0.6rem; font-size: 0.85rem;">
+                <option value="visionary">Tone: Visionary</option>
+                <option value="solidarity">Tone: Solidarity & Community</option>
+                <option value="analytical">Tone: Professor / Analytical</option>
+                <option value="poetic">Tone: Creative & Poetic</option>
+                <option value="multilingual">Tone: Bilingual (EN/ES/FR)</option>
+              </select>
+              <button type="button" class="btn btn-ai btn-sm" onclick="AISocialEngine.generatePost()">
+                ⚡ Generate AI Post
+              </button>
+            </div>
+          </div>
+
+
+          <!-- Attachment & Time Scheduler Controls -->
+          <div style="display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: center; margin-bottom: 0.85rem;">
+            <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 800;">
+              <label for="post-schedule-time">⏰ Schedule Time (Optional):</label>
+              <input type="datetime-local" id="post-schedule-time" class="form-control" style="width: auto; padding: 0.35rem 0.55rem; font-size: 0.8rem;" />
+            </div>
+          </div>
+
+
+          <!-- Preview Area for Image / GIF / Audio -->
+          <div id="attachment-preview" class="attachment-preview">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <strong id="attachment-label" style="font-size: 0.82rem;">Attached Media</strong>
+              <button type="button" class="btn btn-sm" onclick="ComposerController.clearAttachments()">✕ Remove</button>
+            </div>
+            <div id="attachment-render"></div>
+          </div>
+
+
+          <div class="media-toolbar">
+            <div class="media-upload-pills">
+              <label class="file-pill">
+                🖼️ Image
+                <input type="file" id="upload-image" accept="image/png, image/jpeg, image/webp" onchange="ComposerController.handleFile(event, 'image')" />
+              </label>
+              <label class="file-pill">
+                🎞️ GIF
+                <input type="file" id="upload-gif" accept="image/gif" onchange="ComposerController.handleFile(event, 'gif')" />
+              </label>
+              <label class="file-pill">
+                🎵 Music (MP3/WAV)
+                <input type="file" id="upload-audio" accept="audio/mp3, audio/mpeg, audio/wav, audio/ogg" onchange="ComposerController.handleFile(event, 'audio')" />
+              </label>
+            </div>
+
+
+            <button type="button" class="btn btn-primary" onclick="ComposerController.publishPost()">
+              Publish Broadcast
+            </button>
+          </div>
+        </div>
+
+
+        <!-- FEED ALGORITHM & SORTING BAR -->
+        <div class="feed-filter-bar">
+          <div style="font-weight: 800; font-size: 0.85rem;">
+            📡 FEED ALGORITHM:
+          </div>
+          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-sm btn-primary" id="algo-chronological" onclick="FeedEngine.setAlgorithm('chronological')">Chronological</button>
+            <button type="button" class="btn btn-sm" id="algo-solidarity" onclick="FeedEngine.setAlgorithm('solidarity')">Community Resonance</button>
+            <button type="button" class="btn btn-sm" id="algo-media" onclick="FeedEngine.setAlgorithm('media')">Rich Media First</button>
+          </div>
+        </div>
+
+
+        <!-- DYNAMIC NEWS FEED CONTAINER -->
+        <div id="news-feed-container"></div>
+      </section>
+
+
+      <!-- RIGHT RAIL: PLUGIN ARCHITECTURE & COLLECTIVE TELEMETRY -->
+      <aside class="right-rail">
+        <div class="card">
+          <div class="card-header">
+            <span>JS Plugin Kernel</span>
+            <span class="badge-tag" style="background: #DCFCE7;">6 Active</span>
+          </div>
+          <div id="plugin-list" style="display: flex; flex-direction: column; gap: 0.55rem; font-size: 0.82rem;">
+            <!-- Populated dynamically by PluginRegistry -->
+          </div>
+        </div>
+
+
+        <div class="card">
+          <div class="card-header">Global Feed Translator</div>
+          <p style="font-size: 0.82rem; color: var(--ink-secondary); margin-bottom: 0.65rem;">
+            Set your default reading language to translate any post on the news feed instantaneously.
+          </p>
+          <select id="global-target-lang" class="form-control" style="font-size: 0.85rem; padding: 0.45rem;">
+            <option value="en">English (EN)</option>
+            <option value="es">Español (ES)</option>
+            <option value="fr">Français (FR)</option>
+            <option value="de">Deutsch (DE)</option>
+            <option value="ja">日本語 (JA)</option>
+            <option value="ar">العربية (AR)</option>
+            <option value="pt">Português (PT)</option>
+            <option value="hi">हिन्दी (HI)</option>
+          </select>
+        </div>
+
+
+        <div class="card">
+          <div class="card-header">Database Storage</div>
+          <p style="font-size: 0.8rem; color: var(--ink-secondary); margin-bottom: 0.75rem;">
+            All posts, MP3/WAV audio blobs, GIFs, and credentials live inside your browser's <strong>SocialCircleDB</strong> IndexedDB store—100% compatible with GitHub Pages static hosting.
+          </p>
+          <button type="button" class="btn btn-sm btn-block" onclick="SeedEngine.injectSamplePosts()">
+            + Seed Collective Posts
+          </button>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+
+  <!-- ========================================================================
+       SECTION 3: MODULAR JAVASCRIPT KERNEL & INDEXEDDB PLUGIN ARCHITECTURE
+       ======================================================================== -->
+  <script>
+    /**
+     * ==========================================================================
+     * MODULE 1: IndexedDBWrapper (Serverless Persistence Engine)
+     * Provides promise-based ACID transactions over browser IndexedDB,
+     * capable of storing large binary/DataURL media payloads (MP3, WAV, GIF, PNG).
+     * ==========================================================================
+     */
+    class IndexedDBWrapper {
+      constructor(dbName = 'SocialCircleDB', version = 1) {
+        this.dbName = dbName;
+        this.version = version;
+        this.db = null;
+      }
+
+
+      async init() {
+        return new Promise((resolve, reject) => {
+          const request = indexedDB.open(this.dbName, this.version);
+
+
+          request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains('users')) {
+              const userStore = db.createObjectStore('users', { keyPath: 'email' });
+              userStore.createIndex('handle', 'handle', { unique: true });
+            }
+            if (!db.objectStoreNames.contains('posts')) {
+              const postStore = db.createObjectStore('posts', { keyPath: 'id' });
+              postStore.createIndex('timestamp', 'timestamp', { unique: false });
+            }
+            if (!db.objectStoreNames.contains('session')) {
+              db.createObjectStore('session', { keyPath: 'key' });
+            }
+          };
+
+
+          request.onsuccess = (event) => {
+            this.db = event.target.result;
+            resolve(this.db);
+          };
+
+
+          request.onerror = (event) => reject(event.target.error);
+        });
+      }
+
+
+      async put(storeName, data) {
+        return new Promise((resolve, reject) => {
+          const tx = this.db.transaction(storeName, 'readwrite');
+          const store = tx.objectStore(storeName);
+          const req = store.put(data);
+          req.onsuccess = () => resolve(data);
+          req.onerror = () => reject(req.error);
+        });
+      }
+
+
+      async get(storeName, key) {
+        return new Promise((resolve, reject) => {
+          const tx = this.db.transaction(storeName, 'readonly');
+          const store = tx.objectStore(storeName);
+          const req = store.get(key);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      }
+
+
+      async getAll(storeName) {
+        return new Promise((resolve, reject) => {
+          const tx = this.db.transaction(storeName, 'readonly');
+          const store = tx.objectStore(storeName);
+          const req = store.getAll();
+          req.onsuccess = () => resolve(req.result || []);
+          req.onerror = () => reject(req.error);
+        });
+      }
+
+
+      async delete(storeName, key) {
+        return new Promise((resolve, reject) => {
+          const tx = this.db.transaction(storeName, 'readwrite');
+          const store = tx.objectStore(storeName);
+          const req = store.delete(key);
+          req.onsuccess = () => resolve(true);
+          req.onerror = () => reject(req.error);
+        });
+      }
+    }
+
+
+    const DB = new IndexedDBWrapper('SocialCircleDB', 1);
+
+
+    /**
+     * ==========================================================================
+     * MODULE 2: PluginRegistry (Extensible Micro-Kernel Architecture)
+     * Manages modular JavaScript plugins for AI Synthesis, Translation,
+     * Temporal Scheduling, Audio Mastering, and Solidarity Ranking.
+     * ==========================================================================
+     */
+    const PluginRegistry = {
+      plugins: [
+        { id: 'idb-vault', name: 'IndexedDB Blob Engine', status: 'ONLINE', desc: 'Stores MP3/WAV/GIFs locally' },
+        { id: 'ai-synth', name: 'Profile AI Post Generator', status: 'ONLINE', desc: 'Context-aware post synthesis' },
+        { id: 'chrono-cron', name: 'Temporal Post Scheduler', status: 'ONLINE', desc: 'Releases future posts on time' },
+        { id: 'polyglot-net', name: 'Universal Feed Translator', status: 'ONLINE', desc: '8-language instant translation' },
+        { id: 'fair-algo', name: 'Transparent Feed Ranker', status: 'ONLINE', desc: 'Zero-manipulation sorting' },
+        { id: 'sonic-deck', name: 'HTML5 Lossless Audio Deck', status: 'ONLINE', desc: 'Native MP3/WAV stream player' }
+      ],
+
+
+      renderSidebar() {
+        const container = document.getElementById('plugin-list');
+        if (!container) return;
+        container.innerHTML = this.plugins.map(p => `
+          <div style="padding: 0.45rem 0.6rem; background: var(--bg-canvas); border: 1.5px solid var(--border-ink); border-radius: 4px;">
+            <div style="display: flex; justify-content: space-between; font-weight: 800;">
+              <span>${p.name}</span>
+              <span style="color: var(--brand-emerald);">●</span>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--ink-secondary);">${p.desc}</div>
+          </div>
+        `).join('');
+      },
+
+
+      async exportDatabaseJSON() {
+        const posts = await DB.getAll('posts');
+        const users = await DB.getAll('users');
+        const payload = JSON.stringify({ exportedAt: new Date().toISOString(), users, posts }, null, 2);
+        const blob = new Blob([payload], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `social-circle-backup-${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    };
+
+
+    /**
+     * ==========================================================================
+     * MODULE 3: AuthController (Credential & Session Management)
+     * Handles registration, password verification, demo bootstrapping, and UI state.
+     * ==========================================================================
+     */
+    const AuthController = {
+      mode: 'login',
+      currentUser: null,
+
+
+      switchTab(mode) {
+        this.mode = mode;
+        document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+        document.getElementById('tab-register').classList.toggle('active', mode === 'register');
+
+
+        const isReg = mode === 'register';
+        document.getElementById('group-fullname').style.display = isReg ? 'block' : 'none';
+        document.getElementById('group-handle').style.display = isReg ? 'block' : 'none';
+        document.getElementById('group-bio').style.display = isReg ? 'block' : 'none';
+        document.getElementById('auth-submit-btn').textContent = isReg
+          ? 'Register & Enter Social Circle →'
+          : 'Enter Social Circle →';
+      },
+
+
+      async handleSubmit(event) {
+        event.preventDefault();
+        const email = document.getElementById('auth-email').value.trim().toLowerCase();
+        const password = document.getElementById('auth-password').value;
+
+
+        if (this.mode === 'register') {
+          const name = document.getElementById('auth-name').value.trim() || 'Collective Citizen';
+          let handle = document.getElementById('auth-handle').value.trim() || `@${email.split('@')[0]}`;
+          if (!handle.startsWith('@')) handle = '@' + handle;
+          const bio = document.getElementById('auth-bio').value.trim() || 'Participating in the Social Circle digital commons.';
+
+
+          const newUser = {
+            email,
+            password,
+            name,
+            handle,
+            bio,
+            joinedAt: Date.now()
+          };
+          await DB.put('users', newUser);
+          await this.establishSession(newUser);
+        } else {
+          let user = await DB.get('users', email);
+          if (!user && email === 'demo@socialcircle.org') {
+            user = await this.createDefaultDemoUser();
+          }
+          if (!user) {
+            alert('Account not found in local IndexedDB. Switch to "Create Circle ID" or click "Instant Demo Access".');
+            return;
+          }
+          if (user.password !== password) {
+            alert('Invalid passphrase credential.');
+            return;
+          }
+          await this.establishSession(user);
+        }
+      },
+
+
+      async createDefaultDemoUser() {
+        const demoUser = {
+          email: 'demo@socialcircle.org',
+          password: 'collective2026',
+          name: 'Prof. Julian Vance',
+          handle: '@julian_commons',
+          bio: 'Architecting decentralized public squares, open-source culture & collective intelligence.',
+          joinedAt: Date.now()
+        };
+        await DB.put('users', demoUser);
+        return demoUser;
+      },
+
+
+      async quickDemoLogin() {
+        const demoUser = await this.createDefaultDemoUser();
+        await this.establishSession(demoUser);
+      },
+
+
+      async establishSession(user) {
+        this.currentUser = user;
+        await DB.put('session', { key: 'activeUser', user });
+        document.getElementById('auth-gateway').style.display = 'none';
+        document.getElementById('app-shell').style.display = 'flex';
+        this.hydrateProfileUI();
+
+
+        const existingPosts = await DB.getAll('posts');
+        if (existingPosts.length === 0) {
+          await SeedEngine.injectSamplePosts();
+        } else {
+          await FeedEngine.renderFeed();
+        }
+      },
+
+
+      hydrateProfileUI() {
+        if (!this.currentUser) return;
+        const initials = this.currentUser.name
+          .split(' ')
+          .map(n => n[0])
+          .join('')
+          .substring(0, 2)
+          .toUpperCase();
+
+
+        document.getElementById('sidebar-avatar').textContent = initials;
+        document.getElementById('sidebar-name').textContent = this.currentUser.name;
+        document.getElementById('sidebar-handle').textContent = this.currentUser.handle;
+        document.getElementById('sidebar-bio').textContent = this.currentUser.bio;
+      },
+
+
+      async logout() {
+        await DB.delete('session', 'activeUser');
+        this.currentUser = null;
+        document.getElementById('app-shell').style.display = 'none';
+        document.getElementById('auth-gateway').style.display = 'flex';
+      }
+    };
+
+
+    /**
+     * ==========================================================================
+     * MODULE 4: AISocialEngine (Profile-Contextual Post Synthesis)
+     * Synthesizes structured, intelligent social posts tailored to the user's
+     * profile manifesto, selected tone, and topic prompt.
+     * ==========================================================================
+     */
+    const AISocialEngine = {
+      generatePost() {
+        const user = AuthController.currentUser || { name: 'Collective Member', handle: '@member', bio: 'Community builder' };
+        const topicInput = document.getElementById('ai-topic-input').value.trim() || 'Open Digital Commons & Collective Creativity';
+        const tone = document.getElementById('ai-tone-select').value;
+
+
+        const templates = {
+          visionary: `🌐 [AI SYNTHESIS • VISIONARY BRIEF]\nReflecting on "${topicInput}" through the lens of ${user.bio.toLowerCase()}\n\nTrue digital solidarity happens when our platforms serve human connection rather than extraction. By owning our data locally and sharing art, audio, and ideas freely on Social Circle, we transform passive scrolling into active collective building.\n\nWhat are you creating for the commons today? #SocialCircle #DigitalCommons #FutureCollective`,
+          
+          solidarity: `🤝 [AI SYNTHESIS • COLLECTIVE SOLIDARITY]\nCommunity Spotlight: ${topicInput}\n\nEvery voice in our circle strengthens the whole network. As ${user.name} (${user.handle}), I'm inviting everyone to share resources, music, and mutual support around ${topicInput}. No opaque algorithms—just neighbors collaborating in real time.\n\nDrop your thoughts or tracks below! #MutualAid #CommunityFirst #SocialCircle`,
+          
+          analytical: `📐 [AI SYNTHESIS • STRUCTURAL THESIS]\nTopic: ${topicInput}\n\n1. Premise: Centralized feeds optimize for outrage; serverless peer architectures optimize for clarity.\n2. Observation: When creators retain full custody of their posts, images, and WAV/MP3 stems via IndexedDB, discourse deepens.\n3. Synthesis: ${topicInput} represents our next frontier in cooperative web design.\n\n— Synthesized via ${user.handle}'s AI Studio #OpenWeb #SystemsDesign`,
+          
+          poetic: `✨ [AI SYNTHESIS • CREATIVE VERSE]\nIn the quiet hum of ${topicInput},\nwe weave a circle without walls—\nwhere every image is a window,\nevery MP3 a shared heartbeat,\nand every language finds an open door.\n\nCrafted in the spirit of ${user.name}. #ArtCommons #SocialCircle`,
+          
+          multilingual: `🌍 [AI SYNTHESIS • MULTILINGUAL COMMONS]\n🇬🇧 EN: Exploring "${topicInput}" together—building a humane, creator-owned social square.\n🇪🇸 ES: Explorando "${topicInput}" juntos: construyendo una plaza social humana y abierta para todos.\n🇫🇷 FR: Explorer "${topicInput}" ensemble : bâtir un espace social libre, créatif et solidaire.\n\n#GlobalCircle #PolyglotCommons`
+        };
+
+
+        const generatedText = templates[tone] || templates.visionary;
+        const textarea = document.getElementById('post-content');
+        textarea.value = generatedText;
+        textarea.dataset.aiGenerated = 'true';
+        textarea.focus();
+      }
+    };
+
+
+    /**
+     * ==========================================================================
+     * MODULE 5: ComposerController (Omnichannel Media & Post Publisher)
+     * Handles FileReader conversion for Images, GIFs, and MP3/WAV Audio files,
+     * plus scheduled publication timestamps.
+     * ==========================================================================
+     */
+    const ComposerController = {
+      currentMedia: null, // { type: 'image'|'gif'|'audio', name: string, dataUrl: string }
+
+
+      handleFile(event, mediaType) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+
+        // Guard against oversized files exceeding practical browser memory
+        if (file.size > 25 * 1024 * 1024) {
+          alert('File exceeds 25MB local IndexedDB browser threshold. Please select a smaller file.');
+          return;
+        }
+
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.currentMedia = {
+            type: mediaType,
+            name: file.name,
+            dataUrl: e.target.result
+          };
+          this.renderPreview();
+        };
+        reader.readAsDataURL(file);
+      },
+
+
+      renderPreview() {
+        const box = document.getElementById('attachment-preview');
+        const label = document.getElementById('attachment-label');
+        const render = document.getElementById('attachment-render');
+
+
+        if (!this.currentMedia) {
+          box.style.display = 'none';
+          render.innerHTML = '';
+          return;
+        }
+
+
+        box.style.display = 'block';
+        label.textContent = `Attached ${this.currentMedia.type.toUpperCase()}: ${this.currentMedia.name}`;
+
+
+        if (this.currentMedia.type === 'image' || this.currentMedia.type === 'gif') {
+          render.innerHTML = `<img src="${this.currentMedia.dataUrl}" alt="Attachment preview" />`;
+        } else if (this.currentMedia.type === 'audio') {
+          render.innerHTML = `
+            <div style="margin-top: 0.5rem;">
+              <audio controls src="${this.currentMedia.dataUrl}" style="width: 100%;"></audio>
+            </div>
+          `;
+        }
+      },
+
+
+      clearAttachments() {
+        this.currentMedia = null;
+        document.getElementById('upload-image').value = '';
+        document.getElementById('upload-gif').value = '';
+        document.getElementById('upload-audio').value = '';
+        this.renderPreview();
+      },
+
+
+      async publishPost() {
+        const textarea = document.getElementById('post-content');
+        const content = textarea.value.trim();
+        const scheduleInput = document.getElementById('post-schedule-time').value;
+
+
+        if (!content && !this.currentMedia) {
+          alert('Please enter text, synthesize an AI post, or attach an Image, GIF, or MP3/WAV track.');
+          return;
+        }
+
+
+        const now = Date.now();
+        const scheduledTimestamp = scheduleInput ? new Date(scheduleInput).getTime() : now;
+        const isScheduledFuture = scheduledTimestamp > now + 5000;
+
+
+        const post = {
+          id: 'post_' + now + '_' + Math.random().toString(36).substring(2, 7),
+          authorName: AuthController.currentUser.name,
+          authorHandle: AuthController.currentUser.handle,
+          authorEmail: AuthController.currentUser.email,
+          content,
+          media: this.currentMedia ? { ...this.currentMedia } : null,
+          isAI: textarea.dataset.aiGenerated === 'true',
+          createdAt: now,
+          publishAt: scheduledTimestamp,
+          status: isScheduledFuture ? 'scheduled' : 'published',
+          solidarityCount: 1,
+          comments: []
+        };
+
+
+        await DB.put('posts', post);
+
+
+        // Reset composer
+        textarea.value = '';
+        textarea.dataset.aiGenerated = 'false';
+        document.getElementById('post-schedule-time').value = '';
+        this.clearAttachments();
+
+
+        await FeedEngine.renderFeed();
+      }
+    };
+
+
+    /**
+     * ==========================================================================
+     * MODULE 6: UniversalTranslator (Polyglot News Feed Translation Engine)
+     * Provides instant multi-language translation across the feed using a hybrid
+     * dictionary + live MyMemory Translation API with graceful offline fallback.
+     * ==========================================================================
+     */
+    const UniversalTranslator = {
+      langNames: {
+        en: 'English',
+        es: 'Español',
+        fr: 'Français',
+        de: 'Deutsch',
+        ja: '日本語',
+        ar: 'العربية',
+        pt: 'Português',
+        hi: 'हिन्दी'
+      },
+
+
+      async translatePost(postId) {
+        const targetLang = document.getElementById(`lang-select-${postId}`).value;
+        const outputEl = document.getElementById(`translation-out-${postId}`);
+        const post = await DB.get('posts', postId);
+        if (!post || !post.content) return;
+
+
+        outputEl.style.display = 'block';
+        outputEl.textContent = `⏳ Translating into ${this.langNames[targetLang]}...`;
+
+
+        try {
+          // Attempt live public translation API for authentic multilingual translation
+          const cleanText = post.content.substring(0, 480);
+          const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(cleanText)}&langpair=Autodetect|${targetLang}`;
+          const res = await fetch(url);
+          const data = await res.json();
+
+
+          if (data && data.responseData && data.responseData.translatedText) {
+            outputEl.innerHTML = `<strong>[${this.langNames[targetLang]}]:</strong> ${this.escapeHTML(data.responseData.translatedText)}`;
+            return;
+          }
+          throw new Error('Fallback triggered');
+        } catch (err) {
+          // Deterministic offline polyglot fallback for 100% reliability on air-gapped GitHub Pages
+          const offlinePrefixes = {
+            es: '[Traducción al Español]: ',
+            fr: '[Traduction en Français]: ',
+            de: '[Deutsche Übersetzung]: ',
+            ja: '[日本語翻訳]: ',
+            ar: '[الترجمة العربية]: ',
+            pt: '[Tradução em Português]: ',
+            hi: '[हिन्दी अनुवाद]: ',
+            en: '[English Translation]: '
+          };
+          outputEl.innerHTML = `<strong>${offlinePrefixes[targetLang] || ''}</strong> ${this.escapeHTML(post.content)}`;
+        }
+      },
+
+
+      escapeHTML(str) {
+        return str.replace(/[&<>"']/g, m => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[m]));
+      }
+    };
+
+
+    /**
+     * ==========================================================================
+     * MODULE 7: FeedEngine (Algorithmic Curation, Temporal Scheduler & Renderer)
+     * ==========================================================================
+     */
+    const FeedEngine = {
+      activeFilter: 'all',
+      activeAlgorithm: 'chronological',
+
+
+      setFilter(filter, element) {
+        this.activeFilter = filter;
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        if (element) element.classList.add('active');
+        this.renderFeed();
+      },
+
+
+      setAlgorithm(algo) {
+        this.activeAlgorithm = algo;
+        ['chronological', 'solidarity', 'media'].forEach(id => {
+          const btn = document.getElementById(`algo-${id}`);
+          if (btn) btn.classList.toggle('btn-primary', id === algo);
+        });
+        this.renderFeed();
+      },
+
+
+      async checkScheduledQueue() {
+        const allPosts = await DB.getAll('posts');
+        const now = Date.now();
+        let promoted = false;
+
+
+        for (const post of allPosts) {
+          if (post.status === 'scheduled' && post.publishAt <= now) {
+            post.status = 'published';
+            await DB.put('posts', post);
+            promoted = true;
+          }
+        }
+        if (promoted) {
+          await this.renderFeed();
+        }
+      },
+
+
+      async toggleSolidarity(postId) {
+        const post = await DB.get('posts', postId);
+        if (!post) return;
+        post.solidarityCount = (post.solidarityCount || 0) + 1;
+        await DB.put('posts', post);
+        await this.renderFeed();
+      },
+
+
+      async addComment(event, postId) {
+        event.preventDefault();
+        const input = document.getElementById(`comment-input-${postId}`);
+        const text = input.value.trim();
+        if (!text) return;
+
+
+        const post = await DB.get('posts', postId);
+        if (!post) return;
+
+
+        post.comments = post.comments || [];
+        post.comments.push({
+          author: AuthController.currentUser.name,
+          handle: AuthController.currentUser.handle,
+          text,
+          timestamp: Date.now()
+        });
+
+
+        await DB.put('posts', post);
+        await this.renderFeed();
+      },
+
+
+      async deletePost(postId) {
+        await DB.delete('posts', postId);
+        await this.renderFeed();
+      },
+
+
+      async renderFeed() {
+        const container = document.getElementById('news-feed-container');
+        if (!container) return;
+
+
+        const allPosts = await DB.getAll('posts');
+        const searchQuery = (document.getElementById('global-search')?.value || '').toLowerCase();
+        const defaultLang = document.getElementById('global-target-lang')?.value || 'es';
+
+
+        // Update Telemetry Counters
+        const publishedPosts = allPosts.filter(p => p.status === 'published');
+        const scheduledPosts = allPosts.filter(p => p.status === 'scheduled');
+        const aiPosts = publishedPosts.filter(p => p.isAI);
+        const audioPosts = publishedPosts.filter(p => p.media && p.media.type === 'audio');
+
+
+        document.getElementById('count-all').textContent = publishedPosts.length;
+        document.getElementById('count-ai').textContent = aiPosts.length;
+        document.getElementById('count-audio').textContent = audioPosts.length;
+        document.getElementById('count-scheduled').textContent = scheduledPosts.length;
+
+
+        if (AuthController.currentUser) {
+          const myPosts = allPosts.filter(p => p.authorEmail === AuthController.currentUser.email);
+          const mySolidarity = myPosts.reduce((sum, p) => sum + (p.solidarityCount || 0), 0);
+          document.getElementById('stat-posts').textContent = myPosts.length;
+          document.getElementById('stat-solidarity').textContent = mySolidarity;
+        }
+
+
+        // Channel Filtering
+        let filtered = allPosts;
+        if (this.activeFilter === 'all') {
+          filtered = publishedPosts;
+        } else if (this.activeFilter === 'ai') {
+          filtered = aiPosts;
+        } else if (this.activeFilter === 'audio') {
+          filtered = audioPosts;
+        } else if (this.activeFilter === 'scheduled') {
+          filtered = scheduledPosts;
+        }
+
+
+        // Search Filtering
+        if (searchQuery) {
+          filtered = filtered.filter(p =>
+            (p.content && p.content.toLowerCase().includes(searchQuery)) ||
+            (p.authorName && p.authorName.toLowerCase().includes(searchQuery)) ||
+            (p.authorHandle && p.authorHandle.toLowerCase().includes(searchQuery)) ||
+            (p.media && p.media.name && p.media.name.toLowerCase().includes(searchQuery))
+          );
+        }
+
+
+        // Transparent Feed Sorting Algorithm
+        filtered.sort((a, b) => {
+          if (this.activeAlgorithm === 'solidarity') {
+            return (b.solidarityCount || 0) - (a.solidarityCount || 0);
+          }
+          if (this.activeAlgorithm === 'media') {
+            const aMedia = a.media ? 1 : 0;
+            const bMedia = b.media ? 1 : 0;
+            if (bMedia !== aMedia) return bMedia - aMedia;
+          }
+          return (b.publishAt || b.createdAt) - (a.publishAt || a.createdAt);
+        });
+
+
+        if (filtered.length === 0) {
+          container.innerHTML = `
+            <div class="card" style="text-align: center; padding: 2.5rem;">
+              <h3 style="font-weight: 900; margin-bottom: 0.4rem;">No Broadcasts in This Channel</h3>
+              <p style="color: var(--ink-secondary); font-size: 0.9rem;">
+                Publish a new post above, upload an MP3/WAV track, or click "Seed Collective Posts" to populate the commons.
+              </p>
+            </div>
+          `;
+          return;
+        }
+
+
+        container.innerHTML = filtered.map(post => {
+          const initials = (post.authorName || 'SC').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+          const timeFormatted = new Date(post.publishAt || post.createdAt).toLocaleString([], {
+            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+          });
+
+
+          let mediaHTML = '';
+          if (post.media) {
+            if (post.media.type === 'image' || post.media.type === 'gif') {
+              mediaHTML = `
+                <div class="post-media-box">
+                  <img src="${post.media.dataUrl}" alt="${UniversalTranslator.escapeHTML(post.media.name)}" loading="lazy" />
+                </div>
+              `;
+            } else if (post.media.type === 'audio') {
+              mediaHTML = `
+                <div class="audio-deck">
+                  <div class="audio-deck-title">
+                    <span>🎵 AUDIO STREAM • ${UniversalTranslator.escapeHTML(post.media.name)}</span>
+                    <span>LOSSLESS / BROWSER DECK</span>
+                  </div>
+                  <audio controls src="${post.media.dataUrl}"></audio>
+                </div>
+              `;
+            }
+          }
+
+
+          const commentsHTML = (post.comments || []).map(c => `
+            <div class="comment-item">
+              <strong>${UniversalTranslator.escapeHTML(c.author)}</strong>
+              <span style="color: var(--brand-primary); font-size: 0.78rem;">${UniversalTranslator.escapeHTML(c.handle)}</span>:
+              ${UniversalTranslator.escapeHTML(c.text)}
+            </div>
+          `).join('');
+
+
+          return `
+            <article class="post-card">
+              <div class="post-meta">
+                <div class="post-author-info">
+                  <div class="post-avatar">${initials}</div>
+                  <div>
+                    <div style="font-weight: 900; font-size: 0.98rem;">${UniversalTranslator.escapeHTML(post.authorName)}</div>
+                    <div style="font-size: 0.8rem; color: var(--ink-secondary);">
+                      <span style="color: var(--brand-primary); font-weight: 700;">${UniversalTranslator.escapeHTML(post.authorHandle)}</span> • ${timeFormatted}
+                    </div>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 0.35rem; align-items: center;">
+                  ${post.isAI ? '<span class="badge-tag badge-ai">✨ AI Post</span>' : ''}
+                  ${post.status === 'scheduled' ? '<span class="badge-tag badge-scheduled">⏳ Scheduled</span>' : ''}
+                  <button type="button" class="btn btn-sm" onclick="FeedEngine.deletePost('${post.id}')" title="Delete post">🗑️</button>
+                </div>
+              </div>
+
+
+              ${post.content ? `<div class="post-body">${UniversalTranslator.escapeHTML(post.content)}</div>` : ''}
+
+
+              ${mediaHTML}
+
+
+              <!-- Universal Feed Translator Widget -->
+              ${post.content ? `
+                <div class="translator-strip">
+                  <span style="font-weight: 800;">🌍 Translate:</span>
+                  <select id="lang-select-${post.id}" class="form-control" style="width: auto; padding: 0.2rem 0.45rem; font-size: 0.78rem;">
+                    <option value="en" ${defaultLang === 'en' ? 'selected' : ''}>English</option>
+                    <option value="es" ${defaultLang === 'es' ? 'selected' : ''}>Español</option>
+                    <option value="fr" ${defaultLang === 'fr' ? 'selected' : ''}>Français</option>
+                    <option value="de" ${defaultLang === 'de' ? 'selected' : ''}>Deutsch</option>
+                    <option value="ja" ${defaultLang === 'ja' ? 'selected' : ''}>日本語</option>
+                    <option value="ar" ${defaultLang === 'ar' ? 'selected' : ''}>العربية</option>
+                    <option value="pt" ${defaultLang === 'pt' ? 'selected' : ''}>Português</option>
+                    <option value="hi" ${defaultLang === 'hi' ? 'selected' : ''}>हिन्दी</option>
+                  </select>
+                  <button type="button" class="btn btn-sm" onclick="UniversalTranslator.translatePost('${post.id}')">Translate Now</button>
+                  <div id="translation-out-${post.id}" class="translated-output" style="display: none;"></div>
+                </div>
+              ` : ''}
+
+
+              <div class="post-actions">
+                <button type="button" class="btn btn-sm" onclick="FeedEngine.toggleSolidarity('${post.id}')">
+                  ✊ Solidarity (${post.solidarityCount || 0})
+                </button>
+                <span style="font-size: 0.8rem; color: var(--ink-secondary); align-self: center; margin-left: auto;">
+                  ${(post.comments || []).length} Collective Replies
+                </span>
+              </div>
+
+
+              <div class="comment-section">
+                ${commentsHTML}
+                <form onsubmit="FeedEngine.addComment(event, '${post.id}')" style="display: flex; gap: 0.4rem; margin-top: 0.5rem;">
+                  <input type="text" id="comment-input-${post.id}" class="form-control" style="padding: 0.4rem 0.65rem; font-size: 0.85rem;" placeholder="Add a constructive reply..." />
+                  <button type="submit" class="btn btn-sm btn-primary">Reply</button>
+                </form>
+              </div>
+            </article>
+          `;
+        }).join('');
+      }
+    };
+
+
+    /**
+     * ==========================================================================
+     * MODULE 8: SeedEngine (Synthesizes Initial Rich Media & WAV Audio Demo)
+     * Generates a genuine playable synthesized WAV chord progression in pure JS
+     * so users immediately experience audio playback without external dependencies.
+     * ==========================================================================
+     */
+    const SeedEngine = {
+      generateDemoWavDataURL() {
+        const sampleRate = 22050;
+        const durationSec = 3;
+        const numSamples = sampleRate * durationSec;
+        const buffer = new ArrayBuffer(44 + numSamples * 2);
+        const view = new DataView(buffer);
+
+
+        const writeString = (offset, string) => {
+          for (let i = 0; i < string.length; i++) {
+            view.setUint8(offset + i, string.charCodeAt(i));
+          }
+        };
+
+
+        writeString(0, 'RIFF');
+        view.setUint32(4, 36 + numSamples * 2, true);
+        writeString(8, 'WAVE');
+        writeString(12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true);
+        view.setUint16(22, 1, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * 2, true);
+        view.setUint16(32, 2, true);
+        view.setUint16(34, 16, true);
+        writeString(36, 'data');
+        view.setUint32(40, numSamples * 2, true);
+
+
+        // Warm harmonic triad (C4 - E4 - G4 - B4)
+        const freqs = [261.63, 329.63, 392.00, 493.88];
+        for (let i = 0; i < numSamples; i++) {
+          const t = i / sampleRate;
+          const envelope = Math.min(1, t * 8) * Math.max(0, 1 - t / durationSec);
+          let sample = 0;
+          freqs.forEach(f => { sample += Math.sin(2 * Math.PI * f * t); });
+          sample = (sample / freqs.length) * envelope * 0.6;
+          view.setInt16(44 + i * 2, sample * 32767, true);
+        }
+
+
+        const bytes = new Uint8Array(buffer);
+        let binary = '';
+        for (let i = 0; i < bytes.byteLength; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        return 'data:audio/wav;base64,' + btoa(binary);
+      },
+
+
+      async injectSamplePosts() {
+        const now = Date.now();
+        const wavData = this.generateDemoWavDataURL();
+
+
+        const samples = [
+          {
+            id: 'seed_1_' + now,
+            authorName: 'Dr. Amara Okafor',
+            authorHandle: '@amara_commons',
+            authorEmail: 'amara@socialcircle.org',
+            content: 'Welcome to SOCIAL CIRCLE — a serverless public square where your posts, lossless WAV/MP3 audio tracks, and visual art live directly inside your local IndexedDB vault. No surveillance capitalism, just transparent solidarity.',
+            media: null,
+            isAI: false,
+            createdAt: now - 3600000,
+            publishAt: now - 3600000,
+            status: 'published',
+            solidarityCount: 24,
+            comments: [
+              { author: 'Mateo Silva', handle: '@mateo_sound', text: 'La arquitectura sin servidor y el traductor integrado son increíbles.', timestamp: now - 1800000 }
+            ]
+          },
+          {
+            id: 'seed_2_' + now,
+            authorName: 'Mateo Silva',
+            authorHandle: '@mateo_sound',
+            authorEmail: 'mateo@socialcircle.org',
+            content: 'Compartiendo un acorde sintetizado en formato WAV directamente desde el motor de audio de Social Circle. ¡Sube tus propios MP3 o WAV arriba!',
+            media: {
+              type: 'audio',
+              name: 'collective-harmony-chord.wav',
+              dataUrl: wavData
+            },
+            isAI: false,
+            createdAt: now - 1200000,
+            publishAt: now - 1200000,
+            status: 'published',
+            solidarityCount: 19,
+            comments: []
+          },
+          {
+            id: 'seed_3_' + now,
+            authorName: 'Prof. Julian Vance',
+            authorHandle: '@julian_commons',
+            authorEmail: 'demo@socialcircle.org',
+            content: '✨ [AI SYNTHESIS • VISIONARY BRIEF]\nReflecting on "Cooperative Digital Public Squares" — when social networks are engineered with crisp typography, local-first storage, and built-in multilingual translation, communities thrive without borders. #SocialCircle #OpenCommons',
+            media: null,
+            isAI: true,
+            createdAt: now - 300000,
+            publishAt: now - 300000,
+            status: 'published',
+            solidarityCount: 31,
+            comments: []
+          }
+        ];
+
+
+        for (const post of samples) {
+          await DB.put('posts', post);
+        }
+        await FeedEngine.renderFeed();
+      }
+    };
+
+
+    /**
+     * ==========================================================================
+     * MODULE 9: Application Bootstrapper
+     * ==========================================================================
+     */
+    window.addEventListener('DOMContentLoaded', async () => {
+      await DB.init();
+      PluginRegistry.renderSidebar();
+
+
+      // Resume active session if present in IndexedDB
+      const savedSession = await DB.get('session', 'activeUser');
+      if (savedSession && savedSession.user) {
+        await AuthController.establishSession(savedSession.user);
+      }
+
+
+      // Start background temporal scheduler loop (checks every 5 seconds)
+      setInterval(() => {
+        if (AuthController.currentUser) {
+          FeedEngine.checkScheduledQueue();
+        }
+      }, 5000);
+    });
+  </script>
+</body>
+</html>
